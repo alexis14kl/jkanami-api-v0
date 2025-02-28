@@ -18,15 +18,10 @@ app = FastAPI()
 
 def configurar_navegador():
     options = Options()
-    options.add_argument("--headless")  # Modo sin cabeza (sin interfaz gráfica)
-    options.add_argument("--no-sandbox")  
-    options.add_argument("--disable-extensions")  
-    options.add_argument("--disable-sync")  
-    options.add_argument("--no-first-run")  
-    options.add_argument("--disable-gpu")  
-    options.add_argument("--disable-software-rasterizer")  
-    options.add_argument("--disable-images")  
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager(version="133.0.6943.141").install()))
+    chrome_options.add_argument('--headless')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
 def obtener_m3u8_link(driver, url):
