@@ -1,9 +1,4 @@
 # pip install fastapi uvicorn
-
-# ejecutar api
-# uvicorn main:app --reload
-
-
 from typing import Union
 from fastapi import FastAPI
 import re
@@ -12,37 +7,46 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 
 app = FastAPI()
 
-# Configurar el navegador en modo headless
 def configurar_navegador():
     options = Options()
-    options.add_argument("--headless")  # Ejecutar en modo headless
-    
+    options.add_argument("--headless")  # Modo sin cabeza (sin interfaz gráfica)
+    options.add_argument("--no-sandbox")  
+    options.add_argument("--disable-extensions")  
+    options.add_argument("--disable-sync")  
+    options.add_argument("--no-first-run")  
+    options.add_argument("--disable-gpu")  
+    options.add_argument("--disable-software-rasterizer")  
+    options.add_argument("--disable-images")  
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
-# Función para obtener el link m3u8
 def obtener_m3u8_link(driver, url):
     driver.get(url)
-    time.sleep(5)  # Agregar un pequeño retraso para que la página se cargue correctamente
+    
+    try:
+        # Espera explícita hasta que el iframe esté disponible
+        iframe = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "player_conte"))
+        )
+        driver.switch_to.frame(iframe)
 
-    # Encontrar el iframe y cambiar el contexto
-    iframe = driver.find_element(By.CLASS_NAME, "player_conte")
-    driver.switch_to.frame(iframe)
+        iframe_html = driver.page_source
+        match = re.search(r"var\s+parts\s*=\s*{[^}]*?swarmId\s*:\s*'([^']+\.m3u8)'", iframe_html)
 
-    # Obtener el código HTML del iframe y buscar el link m3u8
-    iframe_html = driver.page_source
-    match = re.search(r"var\s+parts\s*=\s*{[^}]*?swarmId\s*:\s*'([^']+\.m3u8)'", iframe_html)
+        if match:
+            return match.group(1)
+        else:
+            return None
 
-    if match:
-        return match.group(1)
-    else:
-        return None
+    except Exception as e:
+        return f"Error al obtener el enlace m3u8: {str(e)}"
 
-# Ruta para obtener el enlace m3u8
 @app.get("/get_m3u8/")
 def get_m3u8(url: str):
     driver = configurar_navegador()
@@ -54,8 +58,11 @@ def get_m3u8(url: str):
     else:
         return {"error": "No se encontró el enlace m3u8 en la página proporcionada."}
 
-# Ruta de prueba
 @app.get("/")
 def read_root():
     return {"Hello": "Estás conectado"}
+
+# ejecutar api
+# uvicorn main:app --reload
+
 
