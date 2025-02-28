@@ -11,6 +11,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
+
+# Specify the driver version compatible with the version of Chrome
+
 app = FastAPI()
 
 def configurar_navegador():
@@ -23,7 +26,7 @@ def configurar_navegador():
     options.add_argument("--disable-gpu")  
     options.add_argument("--disable-software-rasterizer")  
     options.add_argument("--disable-images")  
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager(version="133.0.6943.141").install()))
     return driver
 
 def obtener_m3u8_link(driver, url):
