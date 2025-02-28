@@ -22,6 +22,8 @@ def configurar_navegador():
     options.add_argument("--disable-software-rasterizer")  
     options.add_argument("--disable-images")  
     options.add_argument("window-size=1x1")  
+    # Agregar modo headless para que el navegador no se abra visualmente
+    options.add_argument("--headless")
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
