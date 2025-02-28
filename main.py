@@ -66,3 +66,4 @@ def read_root():
 # uvicorn main:app --reload
 
 
+heroku buildpacks:add https://github.com/heroku/heroku-buildpack-chrome-for-testing --app jkanami-api-v0
