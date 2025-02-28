@@ -13,17 +13,9 @@ app = FastAPI()
 
 def configurar_navegador():
     options = Options()
-    options.add_argument("window-size=1x1")
-    options.add_argument("--no-sandbox")  
-    options.add_argument("--disable-extensions")  
-    options.add_argument("--disable-sync")  
-    options.add_argument("--no-first-run")  
-    options.add_argument("--disable-gpu")  
-    options.add_argument("--disable-software-rasterizer")  
-    options.add_argument("--disable-images")  
-    options.add_argument("window-size=1x1")  
-    # Agregar modo headless para que el navegador no se abra visualmente
-    options.add_argument("--headless")
+
+ options.add_argument("--headless")  # Ejecutar en modo headless
+ 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
