@@ -1,75 +1,71 @@
-# pip install fastapi uvicorn
-# pip install fastapi uvicorn
-from typing import Union
-from fastapi import FastAPI
 import re
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
-
-app = FastAPI()
+from webdriver_manager.chrome import ChromeDriverManager
 
 def configurar_navegador():
-    # Create a Chrome options instance
+    # Configuración de las opciones de Chrome para ejecutar sin interfaz gráfica
     options = Options()
-    options.add_argument('--headless')  # Run Chrome in headless mode (without GUI)
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--headless")  # Ejecutar Chrome sin interfaz gráfica
+    options.add_argument("--disable-gpu")  # Desactivar la GPU para mejorar el rendimiento
+    options.add_argument("--no-sandbox")  # Evitar errores en entornos limitados como Heroku
+    options.add_argument("--disable-software-rasterizer")  # Desactivar el renderizado de software
+    options.add_argument("--remote-debugging-port=9222")  # Usar puerto de depuración remoto, útil en entornos como Heroku
 
-    # Initialize the Chrome driver with the specified options
+    # Iniciar el navegador Chrome con las opciones configuradas
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
 def obtener_m3u8_link(driver, url):
-    driver.get(url)
-    
     try:
-        # Wait explicitly for the iframe to be available
-        iframe = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "player_conte"))
-        )
+        # Acceder a la página proporcionada
+        driver.get(url)
+
+        # Esperar un momento para asegurarse de que la página se haya cargado
+        time.sleep(5)  # Ajusta el tiempo si es necesario
+
+        # Cambiar al iframe que contiene el reproductor
+        iframe = driver.find_element(By.CLASS_NAME, "player_conte")
         driver.switch_to.frame(iframe)
 
+        # Obtener el código fuente del iframe
         iframe_html = driver.page_source
-        # Search for the m3u8 link within the iframe's HTML source
+
+        # Buscar el enlace m3u8 utilizando una expresión regular
         match = re.search(r"var\s+parts\s*=\s*{[^}]*?swarmId\s*:\s*'([^']+\.m3u8)'", iframe_html)
 
         if match:
-            return match.group(1)  # Return the m3u8 link found
+            # Si se encuentra un enlace m3u8, devolverlo
+            m3u8_url = match.group(1)
+            return m3u8_url
         else:
-            return None  # Return None if no match is found
-
+            # Si no se encuentra el enlace m3u8
+            return None
     except Exception as e:
-        return f"Error al obtener el enlace m3u8: {str(e)}"  # Return error message if an exception occurs
+        return f"Error al obtener el enlace m3u8: {str(e)}"
 
-@app.get("/get_m3u8/")
-def get_m3u8(url: str):
-    driver = configurar_navegador()  # Configure the browser driver
-    m3u8_url = obtener_m3u8_link(driver, url)  # Get the m3u8 URL from the provided URL
-    driver.quit()  # Close the browser driver
+def main(url):
+    # Configurar el navegador
+    driver = configurar_navegador()
+
+    # Obtener el enlace m3u8 de la página
+    m3u8_url = obtener_m3u8_link(driver, url)
+
+    # Cerrar el navegador después de la ejecución
+    driver.quit()
 
     if m3u8_url:
-        return {"m3u8_url": m3u8_url}  # Return the m3u8 URL if found
+        return m3u8_url
     else:
-        return {"error": "No se encontró el enlace m3u8 en la página proporcionada."}  # Return an error message if not found
+        return "No se encontró el enlace m3u8 en la página proporcionada."
 
-@app.get("/")
-def read_root():
-    return {"Hello": "Estás conectado"}  # Basic endpoint to confirm the API is running
+if __name__ == "__main__":
+    # Puedes pasar la URL que deseas procesar aquí
+    url = "https://www.ejemplo.com"  # Cambia esta URL a la URL que necesites
 
-# To run the app: uvicorn main:app --reload
-
-# For Heroku deployment (these are terminal commands, not part of the Python code):
-# heroku buildpacks:add https://github.com/heroku/heroku-buildpack-chrome-for-testing --app jkanami-api-v0
-
-
-# ejecutar api
-# uvicorn main:app --reload
-
-
-#heroku buildpacks:add https://github.com/heroku/heroku-buildpack-chrome-for-testing --app jkanami-api-v0
+    # Ejecutar la función principal
+    resultado = main(url)
+    print(f"Resultado: {resultado}")
