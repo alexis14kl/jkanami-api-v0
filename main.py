@@ -3,23 +3,24 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from fastapi.responses import JSONResponse
+import time
+import re
 
 # Crear la instancia de la aplicación FastAPI
 app = FastAPI()
 
-# Función que ejecuta el Selenium
-def get_selenium_data():
-    # Configurar las opciones de Chrome para modo headless
+# Función para configurar el navegador (con opciones headless)
+def configurar_navegador():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Asegura que Chrome se ejecute en modo headless
+    chrome_options.add_argument("--headless")  # Ejecutar en modo headless (sin interfaz gráfica)
     chrome_options.add_argument("--no-sandbox")  # Necesario para algunos entornos como Heroku
     chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
     chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
-
-    # Crear el objeto WebDriver
     driver = webdriver.Chrome(options=chrome_options)
+    return driver
 
-    def obtener_m3u8_link(driver, url):
+# Función que obtiene el enlace m3u8 desde la URL proporcionada
+def obtener_m3u8_link(driver, url):
     # Acceder a la página principal
     driver.get(url)
 
@@ -46,8 +47,9 @@ def get_selenium_data():
     else:
         return {"error": "No se encontró el enlace m3u8 dentro del iframe."}
 
+# Ruta de la API para obtener el enlace m3u8
 @app.get("/get-m3u8/")
-async def get_m3u8_link(url: str):  # Aquí cambiamos para recibir el parámetro en la query string
+async def get_m3u8_link_api(url: str):  # Recibir la URL como parámetro de consulta
     # Configurar el navegador
     driver = configurar_navegador()
 
