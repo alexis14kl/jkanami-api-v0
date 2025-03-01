@@ -1,10 +1,10 @@
+import shutil
+import tempfile
 from fastapi import FastAPI
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from fastapi.responses import JSONResponse
-import tempfile
-import os
 
 # Crear la instancia de la aplicación FastAPI
 app = FastAPI()
@@ -21,10 +21,8 @@ def get_selenium_data():
     user_data_dir = tempfile.mkdtemp()  # Crear un directorio temporal
     chrome_options.add_argument(f"--user-data-dir={user_data_dir}")  # Usar el directorio temporal como perfil de usuario
 
-
     # Crear el objeto WebDriver
     driver = webdriver.Chrome(options=chrome_options)
-    
 
     # Acceder a la página
     driver.get("https://www.selenium.dev/selenium/web/web-form.html")
@@ -41,6 +39,9 @@ def get_selenium_data():
 
     # Cerrar el navegador
     driver.quit()
+
+    # Eliminar el directorio temporal después de usarlo
+    shutil.rmtree(user_data_dir)  # Limpiar el directorio temporal creado para el perfil
 
     # Retornar el resultado
     return {"h1_text": h1_text}
