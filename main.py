@@ -15,9 +15,14 @@ def get_selenium_data():
     chrome_options.add_argument("--no-sandbox")  # Necesario para algunos entornos como Heroku
     chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
     chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Usar un puerto de depuración remoto
+    chrome_options.add_argument("--disable-software-rasterizer")  # Desactivar rasterización de software
 
     # Crear el objeto WebDriver
-    driver = webdriver.Chrome(options=chrome_options)
+    try:
+        driver = webdriver.Chrome(options=chrome_options)
+    except Exception as e:
+        return {"error": f"Error al iniciar el navegador: {str(e)}"}
 
     # Acceder a la página
     driver.get("https://jkanime.net/")
