@@ -4,23 +4,31 @@ from fastapi import FastAPI
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import os
 
 # Crear una instancia de FastAPI
 app = FastAPI()
 
+# Asumiendo que estas variables están configuradas en Heroku o de alguna otra forma
+GOOGLE_CHROME_PATH = os.getenv("GOOGLE_CHROME_PATH", "/app/.apt/usr/bin/google_chrome")
+CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH", "/app/.chromedriver/bin/chromedriver")
+
 def configurar_navegador():
+    # Crear opciones para el navegador
     chrome_options = Options()
-    chrome_options.add_argument("--no-sandbox")  # Soluciona problemas con sandboxing
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memoria
-    chrome_options.add_argument("--remote-debugging-port=9222")  # Configura el puerto para depuración remota
-    chrome_options.add_argument("--disable-gpu")  # Deshabilita la aceleración de hardware
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.binary_location = GOOGLE_CHROME_PATH
 
-    # Usa el ChromeDriver correcto
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    # Usar el servicio para el ChromeDriver
+    service = Service(executable_path=CHROMEDRIVER_PATH)
+    
+    # Crear una instancia del navegador con las opciones y servicio
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
-
 
 def obtener_m3u8_link(driver, url):
     # Acceder a la página principal
@@ -33,8 +41,8 @@ def obtener_m3u8_link(driver, url):
     try:
         iframe = driver.find_element(By.CLASS_NAME, "player_conte")
         driver.switch_to.frame(iframe)
-    except:
-        return {"error": "No se encontró el iframe adecuado."}
+    except Exception as e:
+        return {"error": f"No se encontró el iframe adecuado: {str(e)}"}
 
     # Obtener el código fuente dentro del iframe
     iframe_html = driver.page_source
