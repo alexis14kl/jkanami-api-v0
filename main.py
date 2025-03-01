@@ -12,16 +12,13 @@ app = FastAPI()
 
 def configurar_navegador():
     chrome_options = Options()
-    chrome_options.add_argument('--headless')  # Ejecutar Chrome en modo headless
-    chrome_options.add_argument('--disable-gpu')  # Deshabilitar la aceleración de GPU (útil para headless)
-    chrome_options.add_argument('--no-sandbox')  # Evitar errores en entorno sin entorno gráfico
-    chrome_options.add_argument('--remote-debugging-port=9222')  # Configurar puerto de depuración remoto
-    chrome_options.add_argument('--disable-dev-shm-usage')  # Solución a problemas de memoria compartida en algunos entornos (como Heroku)
+    chrome_options.add_argument("--headless")  # Modo sin cabeza
+    chrome_options.add_argument("--no-sandbox")  # Soluciona problemas con sandboxing
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memoria
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Configura el puerto para depuración remota
+    chrome_options.add_argument("--disable-gpu")  # Deshabilita la aceleración de hardware
 
-    # Usar Chromium en vez de Chrome
-    chrome_options.binary_location = '/usr/bin/chromium'
-
-    # Ejecutar el navegador con las opciones configuradas
+    # Usa el ChromeDriver correcto
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
 
