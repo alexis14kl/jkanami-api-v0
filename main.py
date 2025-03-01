@@ -25,6 +25,8 @@ def get_selenium_data():
     # Crear el objeto WebDriver
     driver = webdriver.Chrome(options=chrome_options)
 
+    return driver
+
     # Acceder a la página
     driver.get("https://www.selenium.dev/selenium/web/web-form.html")
 
