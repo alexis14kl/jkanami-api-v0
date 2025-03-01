@@ -3,5 +3,5 @@ fastapi
 uvicorn
 gunicorn
 webdriver-manager
-chromium-binary
+
 
