@@ -16,7 +16,7 @@ def get_selenium_data():
     chrome_options.add_argument("--no-sandbox")  # Necesario para algunos entornos como Heroku
     chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
     chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
-
+chrome_options.add_argument("--remote-debugging-port=9222") 
     # Crear el objeto WebDriver (ya no es necesario especificar el path de chromedriver, ya lo gestiona el buildpack)
     driver = webdriver.Chrome(options=chrome_options)
 
