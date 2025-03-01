@@ -11,22 +11,31 @@ from selenium.webdriver.common.by import By
 app = FastAPI()
 
 def configurar_navegador():
-    options = Options()
-    options.add_argument("window-size=1x1")
-    options.add_argument("--no-sandbox")  # Para evitar problemas en Linux (Heroku está basado en Linux)
-    options.add_argument("--disable-extensions")  # Desactivar extensiones
-    options.add_argument("--disable-sync")  # Desactivar sincronización de Chrome
-    options.add_argument("--no-first-run")  # Desactivar la primera ejecución (configuraciones iniciales)
-    options.add_argument("--disable-gpu")  # Desactivar GPU (aumenta rendimiento)
-    options.add_argument("--disable-software-rasterizer")  # Desactivar la aceleración hardware
-    options.add_argument("--disable-images")  # Desactivar imágenes para mejorar el rendimiento
-    options.add_argument("window-size=1x1")  # Establecer el tamaño de ventana lo más pequeño posible
-    #options.add_argument("--headless")  # Modo headless para no tener una interfaz gráfica
-    options.add_argument("--remote-debugging-port=9222")  # Habilitar la depuración remota
-    options.add_argument("--disable-dev-shm-usage")  # Solución a problemas de memoria compartida en algunos entornos (como Heroku)
+    # Configuración de las opciones de Chrome
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Ejecutar Chrome en modo headless
+chrome_options.add_argument('--disable-gpu')  # Deshabilitar la aceleración de GPU (útil para headless)
+chrome_options.add_argument('--no-sandbox')  # Evitar errores en entorno sin entorno gráfico
+chrome_options.add_argument('--remote-debugging-port=9222')  # Configurar puerto de depuración remoto
 
-    # Iniciar Chrome con DevTools Protocol
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+# Ejecutar el navegador con las opciones configuradas
+driver = webdriver.Chrome(options=chrome_options)
+    # options = Options()
+    # options.add_argument("window-size=1x1")
+    # options.add_argument("--no-sandbox")  # Para evitar problemas en Linux (Heroku está basado en Linux)
+    # options.add_argument("--disable-extensions")  # Desactivar extensiones
+    # options.add_argument("--disable-sync")  # Desactivar sincronización de Chrome
+    # options.add_argument("--no-first-run")  # Desactivar la primera ejecución (configuraciones iniciales)
+    # options.add_argument("--disable-gpu")  # Desactivar GPU (aumenta rendimiento)
+    # options.add_argument("--disable-software-rasterizer")  # Desactivar la aceleración hardware
+    # options.add_argument("--disable-images")  # Desactivar imágenes para mejorar el rendimiento
+    # options.add_argument("window-size=1x1")  # Establecer el tamaño de ventana lo más pequeño posible
+    # #options.add_argument("--headless")  # Modo headless para no tener una interfaz gráfica
+    # options.add_argument("--remote-debugging-port=9222")  # Habilitar la depuración remota
+    # options.add_argument("--disable-dev-shm-usage")  # Solución a problemas de memoria compartida en algunos entornos (como Heroku)
+
+    # # Iniciar Chrome con DevTools Protocol
+    # driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     return driver
 
 def obtener_m3u8_link(driver, url):
