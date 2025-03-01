@@ -22,35 +22,27 @@ def get_selenium_data():
     # Acceder a la página
     driver.get("https://www.selenium.dev/selenium/web/web-form.html")
 
-    # Obtener el título de la página (por si necesitas usarlo)
-    title = driver.title
-
     # Esperar un poco para asegurarse de que los elementos estén cargados
     driver.implicitly_wait(0.5)
 
-    # Localizar los elementos y realizar la interacción
-    text_box = driver.find_element(by=By.NAME, value="my-text")
-    submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
-
-    text_box.send_keys("Selenium")
-    submit_button.click()
-
-    # Obtener el mensaje que aparece después de enviar el formulario
-    message = driver.find_element(by=By.ID, value="message")
-    text = message.text
+    # Buscar el h1 dentro del div con la clase "col-12"
+    try:
+        h1_element = driver.find_element(by=By.CSS_SELECTOR, value="div.col-12 h1.display-6")
+        h1_text = h1_element.text  # Obtener el texto del h1
+    except Exception as e:
+        return {"error": f"No se encontró el h1: {str(e)}"}
 
     # Cerrar el navegador
     driver.quit()
 
     # Retornar el resultado
-    return text
+    return {"h1_text": h1_text}
 
 # Ruta de la API que ejecuta Selenium
 @app.get("/run_selenium")
 async def run_selenium():
     try:
         result = get_selenium_data()  # Ejecutar el código de Selenium
-        return JSONResponse(content={"message": result})  # Retornar el resultado como JSON
+        return JSONResponse(content=result)  # Retornar el resultado como JSON
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
-
