@@ -1,24 +1,20 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
-# Configurar las opciones de Chrome
-op = webdriver.ChromeOptions()
+# Establecer opciones de Chrome
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Ejecutar Chrome sin cabeza
+chrome_options.add_argument('--no-sandbox')  # Evitar problemas en entornos sin cabeza
+chrome_options.add_argument('--disable-dev-shm-usage')  # Solucionar errores de memoria
+chrome_options.add_argument('--remote-debugging-port=9222')  # Puerto para depuración remota
 
-# Especifica la ubicación del ejecutable de Google Chrome
-op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+# Especifica el servicio y el path del driver
+chrome_service = Service(executable_path="/app/.heroku/chrome/bin/google-chrome")
 
-# Añade los argumentos necesarios para ejecutar sin interfaz gráfica
-op.add_argument("--headless")
-op.add_argument("--no-sandbox")
-op.add_argument("--disable-dev-shm-usage")
-
-# Configura el servicio de Chromedriver
-service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
-
-# Inicia el navegador Chrome con el servicio y las opciones configuradas
-driver = webdriver.Chrome(service=service, options=op)
+# Iniciar el navegador
+driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 # Accede a la página deseada
 driver.get("https://jkanime.net/dragon-ball-gt/16/")
