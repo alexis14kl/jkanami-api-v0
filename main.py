@@ -1,32 +1,56 @@
+from fastapi import FastAPI
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from fastapi.responses import JSONResponse
 
-# Set up Chrome options for headless mode
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Ensure chrome runs in headless mode
-chrome_options.add_argument("--no-sandbox")  # Necessary for some environments like Heroku
-chrome_options.add_argument("--disable-dev-shm-usage")  # Disable shared memory
-chrome_options.add_argument("--disable-gpu")  # Disable GPU usage (not needed in headless mode)
+# Crear la instancia de la aplicación FastAPI
+app = FastAPI()
 
-# Create the WebDriver object
-driver = webdriver.Chrome(options=chrome_options)
+# Función que ejecuta el Selenium
+def get_selenium_data():
+    # Configurar las opciones de Chrome para modo headless
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Asegura que Chrome se ejecute en modo headless
+    chrome_options.add_argument("--no-sandbox")  # Necesario para algunos entornos como Heroku
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
+    chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
 
-driver.get("https://www.selenium.dev/selenium/web/web-form.html")
+    # Crear el objeto WebDriver
+    driver = webdriver.Chrome(options=chrome_options)
 
-title = driver.title
+    # Acceder a la página
+    driver.get("https://www.selenium.dev/selenium/web/web-form.html")
 
-driver.implicitly_wait(0.5)
+    # Obtener el título de la página (por si necesitas usarlo)
+    title = driver.title
 
-text_box = driver.find_element(by=By.NAME, value="my-text")
-submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
+    # Esperar un poco para asegurarse de que los elementos estén cargados
+    driver.implicitly_wait(0.5)
 
-text_box.send_keys("Selenium")
-submit_button.click()
+    # Localizar los elementos y realizar la interacción
+    text_box = driver.find_element(by=By.NAME, value="my-text")
+    submit_button = driver.find_element(by=By.CSS_SELECTOR, value="button")
 
-message = driver.find_element(by=By.ID, value="message")
-text = message.text
+    text_box.send_keys("Selenium")
+    submit_button.click()
 
-print(text)  # For debugging purposes
+    # Obtener el mensaje que aparece después de enviar el formulario
+    message = driver.find_element(by=By.ID, value="message")
+    text = message.text
 
-driver.quit()
+    # Cerrar el navegador
+    driver.quit()
+
+    # Retornar el resultado
+    return text
+
+# Ruta de la API que ejecuta Selenium
+@app.get("/run_selenium")
+async def run_selenium():
+    try:
+        result = get_selenium_data()  # Ejecutar el código de Selenium
+        return JSONResponse(content={"message": result})  # Retornar el resultado como JSON
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
