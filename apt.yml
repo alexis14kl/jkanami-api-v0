@@ -1,0 +1,10 @@
+packages:
+  - chromium
+  - libnss3
+  - libgdk-pixbuf2.0-0
+  - libx11-dev
+  - libxcomposite1
+  - libxdamage1
+  - libxrandr2
+  - libgbm1
+  - xdg-utils
