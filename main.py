@@ -32,4 +32,4 @@ def configurar_navegador():
 
 @app.get("/")
 def read_root():
-    return {"message": "¡Hola, FastAPI!"}
+    return {"message": "¡Hola new, FastAPI!"}
