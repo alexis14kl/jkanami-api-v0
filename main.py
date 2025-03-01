@@ -3,7 +3,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from fastapi.responses import JSONResponse
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 
 # Crear la instancia de la aplicación FastAPI
@@ -18,11 +17,8 @@ def get_selenium_data():
     chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
     chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
 
-    # Usar el ChromeDriverManager para gestionar la descarga del chromedriver
-    chrome_driver_path = ChromeDriverManager(version="89.0.4389.23").install()
-
-    # Crear el objeto WebDriver
-    driver = webdriver.Chrome(service=Service(chrome_driver_path), options=chrome_options)
+    # Crear el objeto WebDriver (ya no es necesario especificar el path de chromedriver, ya lo gestiona el buildpack)
+    driver = webdriver.Chrome(options=chrome_options)
 
     # Acceder a la página
     driver.get("https://www.selenium.dev/selenium/web/web-form.html")
