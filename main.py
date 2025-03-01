@@ -1,7 +1,7 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
 
 # Configurar las opciones de Chrome
 op = webdriver.ChromeOptions()
@@ -9,7 +9,9 @@ op = webdriver.ChromeOptions()
 # Especifica la ubicación del ejecutable de Google Chrome
 op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
-# Añade un argumento para desactivar la interfaz de usuario del navegador
+# Añade los argumentos necesarios para ejecutar sin interfaz gráfica
+op.add_argument("--headless")
+op.add_argument("--no-sandbox")
 op.add_argument("--disable-dev-shm-usage")
 
 # Configura el servicio de Chromedriver
@@ -22,7 +24,7 @@ driver = webdriver.Chrome(service=service, options=op)
 driver.get("https://jkanime.net/dragon-ball-gt/16/")
 
 # Espera un poco para asegurarse de que la página se cargue
-driver.implicitly_wait(10)  # Espera hasta 10 segundos para que cargue
+driver.implicitly_wait(10)
 
 # Verifica si la página se ha cargado correctamente (comprobando el título)
 if "Dragon Ball GT" in driver.title:
