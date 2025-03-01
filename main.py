@@ -32,7 +32,7 @@ def get_selenium_data():
 
     # Buscar el h1 dentro del div con la clase "col-12"
     try:
-        h1_element = driver.find_element(by=By.CSS_SELECTOR, value="div.col-lg-3 div.footer__logo")
+        h1_element = driver.find_element(by=By.CSS_SELECTOR, value="div.section-title h5")
         h1_text = h1_element.text  # Obtener el texto del h1
     except Exception as e:
         return {"error": f"No se encontró el h1: {str(e)}"}
