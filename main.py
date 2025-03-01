@@ -23,7 +23,7 @@ def get_selenium_data():
     driver.get("https://jkanime.net/dragon-ball-gt/16/")
 
     # Esperar un poco para asegurarse de que los elementos estén cargados
-    driver.implicitly_wait(0.5)
+    driver.implicitly_wait(0.20)
 
     # Buscar el h1 dentro del div con la clase "col-12"
     try:
