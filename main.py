@@ -12,7 +12,6 @@ app = FastAPI()
 
 def configurar_navegador():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Modo sin cabeza
     chrome_options.add_argument("--no-sandbox")  # Soluciona problemas con sandboxing
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memoria
     chrome_options.add_argument("--remote-debugging-port=9222")  # Configura el puerto para depuración remota
