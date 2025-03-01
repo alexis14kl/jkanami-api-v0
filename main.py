@@ -1,35 +1,30 @@
-import re
-import time
-from fastapi import FastAPI
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 import os
+from selenium import webdriver
 
-# Crear una instancia de FastAPI
-app = FastAPI()
+# Configurar las opciones de Chrome
+op = webdriver.ChromeOptions()
 
-# Asumiendo que estas variables están configuradas en Heroku o de alguna otra forma
-GOOGLE_CHROME_PATH = os.getenv("GOOGLE_CHROME_PATH", "/app/.apt/usr/bin/google_chrome")
-CHROMEDRIVER_PATH = os.getenv("CHROMEDRIVER_PATH", "/app/.chromedriver/bin/chromedriver")
+# Especifica la ubicación del ejecutable de Google Chrome
+op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
-def configurar_navegador():
-    # Crear opciones para el navegador
-    chrome_options = Options()
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.binary_location = GOOGLE_CHROME_PATH
+# Añade un argumento para desactivar la interfaz de usuario del navegador
+op.add_argument("--disable-dev-shm-usage")
 
-    # Usar el servicio para el ChromeDriver
-    service = Service(executable_path=CHROMEDRIVER_PATH)
-    
-    # Crear una instancia del navegador con las opciones y servicio
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
+# Aquí se pasa la ubicación del controlador de Chrome (chromedriver)
+driver = webdriver.Chrome(executable_path=os.environ.get("CROMEDRIVER_PATH"), options=op)
 
-@app.get("/")
-def read_root():
-    return {"message": "¡Hola new, FastAPI!"}
+# Accede a la página deseada
+driver.get("https://jkanime.net/dragon-ball-gt/16/")
+
+# Espera un poco para asegurarse de que la página se cargue
+driver.implicitly_wait(10)  # Espera hasta 10 segundos para que cargue
+
+# Verifica si la página se ha cargado correctamente (comprobando el título)
+if "Dragon Ball GT" in driver.title:
+    print("La página se cargó correctamente")
+else:
+    print("La página no se cargó correctamente")
+
+# Cierra el navegador
+driver.quit()
+
