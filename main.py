@@ -19,42 +19,29 @@ def configurar_navegador():
     driver = webdriver.Chrome(options=chrome_options)
     return driver
 
-# Función que obtiene el enlace m3u8 desde la URL proporcionada
-def obtener_m3u8_link(driver, url):
+# Función para obtener el título del episodio desde la URL proporcionada
+def obtener_titulo_episodio(driver, url):
     # Acceder a la página principal
     driver.get(url)
 
     # Esperar a que la página cargue completamente
     time.sleep(5)  # Ajusta el tiempo si es necesario (espera a que cargue el video)
-    
-    # Cambiar al iframe que contiene el reproductor
+
     try:
-        iframe = driver.find_element(By.CLASS_NAME, "player_conte")
-        driver.switch_to.frame(iframe)
-    except:
-        return {"error": "No se encontró el iframe adecuado."}
+        # Buscar el título del episodio dentro del <h1>
+        titulo = driver.find_element(By.CSS_SELECTOR, "h1.mb-2").text
+        return {"titulo": titulo}
+    except Exception as e:
+        return {"error": f"No se encontró el título del episodio: {str(e)}"}
 
-    # Obtener el código fuente dentro del iframe
-    iframe_html = driver.page_source
-
-    # Buscar el script que contiene 'var parts =' con una expresión regular
-    match = re.search(r"var\s+parts\s*=\s*{[^}]*?swarmId\s*:\s*'([^']+\.m3u8)'", iframe_html)
-
-    if match:
-        # Si encontramos la URL, la retornamos
-        m3u8_url = match.group(1)
-        return {"m3u8_url": m3u8_url}
-    else:
-        return {"error": "No se encontró el enlace m3u8 dentro del iframe."}
-
-# Ruta de la API para obtener el enlace m3u8
-@app.get("/get-m3u8/")
-async def get_m3u8_link_api(url: str):  # Recibir la URL como parámetro de consulta
+# Ruta de la API para obtener el título del episodio
+@app.get("/get-episodio-titulo/")
+async def get_episodio_titulo(url: str):  # Recibir la URL como parámetro de consulta
     # Configurar el navegador
     driver = configurar_navegador()
 
-    # Obtener la URL del m3u8
-    response = obtener_m3u8_link(driver, url)
+    # Obtener el título del episodio
+    response = obtener_titulo_episodio(driver, url)
 
     # Cerrar el navegador después de la ejecución
     driver.quit()
