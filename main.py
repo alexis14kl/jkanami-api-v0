@@ -8,6 +8,7 @@ chrome_options = Options()
 chrome_options.add_argument('--headless')  # Ejecutar Chrome sin cabeza
 chrome_options.add_argument('--no-sandbox')  # Evitar problemas en entornos sin cabeza
 chrome_options.add_argument('--disable-dev-shm-usage')  # Solucionar errores de memoria
+chrome_options.add_argument('----disable-gpu')
 chrome_options.add_argument('--remote-debugging-port=9222')  # Puerto para depuración remota
 
 # Especifica el servicio y el path del driver
