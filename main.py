@@ -3,6 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from fastapi.responses import JSONResponse
+import tempfile
+import os
 
 # Crear la instancia de la aplicación FastAPI
 app = FastAPI()
@@ -20,7 +22,7 @@ def get_selenium_data():
     user_data_dir = tempfile.mkdtemp()  # Crear un directorio temporal
     chrome_options.add_argument(f"--user-data-dir={user_data_dir}")  # Usar el directorio temporal como perfil de usuario
 
-    
+
     # Crear el objeto WebDriver
     driver = webdriver.Chrome(options=chrome_options)
 
