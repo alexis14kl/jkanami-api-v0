@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from fastapi.responses import JSONResponse
+import os
 import time
 
 # Crear la instancia de la aplicación FastAPI
@@ -17,7 +18,8 @@ def configurar_navegador():
     chrome_options.add_argument("--no-sandbox")  # Necesario para algunos entornos como Heroku
     chrome_options.add_argument("--disable-dev-shm-usage")  # Desactivar memoria compartida
     chrome_options.add_argument("--disable-gpu")  # Desactivar el uso de GPU (no necesario en modo headless)
-    driver = webdriver.Chrome(options=chrome_options)
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", "/app/.apt/usr/bin/google-chrome")
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH", "/app/.chromedriver/bin/chromedriver"), options=chrome_options)
     return driver
 
 # Función para obtener el título del episodio desde la URL proporcionada
@@ -26,7 +28,10 @@ def obtener_titulo_episodio(driver, url):
     driver.get(url)
 
     # Esperar a que la página cargue completamente
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.mb-2")))
+    try:
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.mb-2")))
+    except Exception as e:
+        return {"error": f"Error al esperar el elemento: {str(e)}"}
 
     try:
         # Buscar el título del episodio dentro del <h1> con la clase mb-2
