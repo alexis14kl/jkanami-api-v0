@@ -1,17 +1,25 @@
 import os
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 # Configurar las opciones de Chrome
-op = webdriver.ChromeOptions()
+op = Options()
 
 # Especifica la ubicación del ejecutable de Google Chrome
 op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
 # Añade un argumento para desactivar la interfaz de usuario del navegador
 op.add_argument("--disable-dev-shm-usage")
+op.add_argument("--no-sandbox")
 
-# Aquí se pasa la ubicación del controlador de Chrome (chromedriver)
-driver = webdriver.Chrome(executable_path=os.environ.get("CROMEDRIVER_PATH"), options=op)
+# Configura la ubicación del chromedriver utilizando Service
+chromedriver_path = os.environ.get("CHROMEDRIVER_PATH")
+service = Service(chromedriver_path)
+
+# Inicia el controlador de Chrome
+driver = webdriver.Chrome(service=service, options=op)
 
 # Accede a la página deseada
 driver.get("https://jkanime.net/dragon-ball-gt/16/")
@@ -27,4 +35,3 @@ else:
 
 # Cierra el navegador
 driver.quit()
-
