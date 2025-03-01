@@ -2,9 +2,10 @@ from fastapi import FastAPI
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from fastapi.responses import JSONResponse
 import time
-import re
 
 # Crear la instancia de la aplicación FastAPI
 app = FastAPI()
@@ -25,10 +26,10 @@ def obtener_titulo_episodio(driver, url):
     driver.get(url)
 
     # Esperar a que la página cargue completamente
-    time.sleep(5)  # Ajusta el tiempo si es necesario (espera a que cargue el video)
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.mb-2")))
 
     try:
-        # Buscar el título del episodio dentro del <h1>
+        # Buscar el título del episodio dentro del <h1> con la clase mb-2
         titulo = driver.find_element(By.CSS_SELECTOR, "h1.mb-2").text
         return {"titulo": titulo}
     except Exception as e:
