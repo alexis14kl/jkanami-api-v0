@@ -1,20 +1,22 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Configurar las opciones de Chrome
-op = Options()
+op = webdriver.ChromeOptions()
 
-# Especifica la ubicación del ejecutable de Google Chrome (lo maneja el buildpack de Heroku)
+# Especifica la ubicación del ejecutable de Google Chrome
 op.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
 # Añade un argumento para desactivar la interfaz de usuario del navegador
 op.add_argument("--disable-dev-shm-usage")
-op.add_argument("--no-sandbox")
 
-# Aquí el buildpack de Heroku configura automáticamente el chromedriver
-driver = webdriver.Chrome(options=op)
+# Configura el servicio de Chromedriver
+service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+
+# Inicia el navegador Chrome con el servicio y las opciones configuradas
+driver = webdriver.Chrome(service=service, options=op)
 
 # Accede a la página deseada
 driver.get("https://jkanime.net/dragon-ball-gt/16/")
